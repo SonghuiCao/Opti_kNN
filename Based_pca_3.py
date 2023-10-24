@@ -27,11 +27,11 @@ def k_NN(X_train, X_test, y_train, y_test, k):
     start_time = 0
     start_time = time.time()
     knn_classifier.fit(X_train, y_train)
-    end_time = time.time()
-    knn_train_time = end_time - start_time
-
     # Using trained model, predict the result using test data
     knn_pred = knn_classifier.predict(X_test)
+
+    end_time = time.time()
+    knn_train_time = end_time - start_time
 
     # Get the accuracy for the classifier
     knn_accuracy = accuracy_score(y_test, knn_pred)
@@ -196,6 +196,7 @@ if __name__ == '__main__':
         table.add_row(row)
         numOfcom += 5
 
+    print("PCA: ")
     print(table)
 
     print("done in main")
