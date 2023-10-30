@@ -22,25 +22,26 @@ from keras.models import Model, Sequential
 from keras.layers import Conv2D, MaxPooling2D, UpSampling2D
 
 
-def autoencoder(layers_size, dataset):
+def autoencoder(layers_size, train_data, test_data):
+    do = 0.5
     # encoder function
     encoder = Sequential([
         Flatten(input_shape=(28, 28)),
         Dense(layers_size[0]),
         LR(),
-        Dropout(0.5),
+        Dropout(do),
         Dense(layers_size[1]),
         LR(),
-        Dropout(0.5),
+        Dropout(do),
         Dense(layers_size[2]),
         LR(),
-        Dropout(0.5),
+        Dropout(do),
         Dense(layers_size[3]),
         LR(),
-        Dropout(0.5),
+        Dropout(do),
         Dense(layers_size[4]),
         LR(),
-        Dropout(0.5),
+        Dropout(do),
         Dense(layers_size[5]),
         LR()
     ])
@@ -80,9 +81,10 @@ def autoencoder(layers_size, dataset):
     # history = model.fit(x_train, x_train, epochs = 5)
     # print(history.history['loss'])
 
-    code = model_encoder.predict(dataset)
+    train_code = model_encoder.predict(train_data)
+    test_code = model_encoder.predict(test_data)
 
-    return code
+    return train_code, test_code
 
 def con_autoencoder(layers_size, dataset):
     input_img = Input(shape=(28, 28, 1))  # Assuming grayscale images
@@ -166,7 +168,7 @@ if __name__ == '__main__':
 
     # layers_size = [640, 520, 400, 280, 150]
     numOfcom = 5
-    maxNumCom = 100
+    maxNumCom = 200
     ks = np.array([1, 3, 5])
 
     str_array = ks.astype(str)
@@ -177,25 +179,29 @@ if __name__ == '__main__':
     table.field_names = col_name
 
     while numOfcom <= maxNumCom :
-        layers_size = [640, 520, 400, 280, 150]
+        layers_size = [640, 520, 400, 280, 200]
         layers_size.append(numOfcom)
         row = [numOfcom]
         for k in ks:
 
             # ---------------------- my autoencoder ----------------------
-            coded_train_x = autoencoder(layers_size, x_train)
-            coded_test_x = autoencoder(layers_size, x_test)
+            coded_train_x, coded_test_x = autoencoder(layers_size, x_train, x_test)
 
             my_acc, my_time = k_NN(coded_train_x, coded_test_x, train_y, test_y, k)
 
             row.append(("(" + str(my_acc) + ", " + str(my_time) + ")"))
-            print(numOfcom, " --- ", k)
-            print("(" + str(my_acc) + ", " + str(my_time) + ")")
+            # print(numOfcom, " --- ", k)
+            # print("(" + str(my_acc) + ", " + str(my_time) + ")")
         table.add_row(row)
         numOfcom += 5
 
     print("Autoencoder with layers_size = [640, 520, 400, 280, 150, 'size of code']: ")
     print(table)
+
+    # data = table.get_string()
+
+    with open('file200', 'w') as w:
+        w.write(str(table))
 
     print("done in main")
     # EPOCHS = 5

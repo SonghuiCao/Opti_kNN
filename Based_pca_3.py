@@ -199,6 +199,9 @@ if __name__ == '__main__':
     print("PCA: ")
     print(table)
 
+    with open('filepca', 'w') as w:
+        w.write(str(table))
+
     print("done in main")
 
 
